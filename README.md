@@ -67,12 +67,11 @@ bistro92-final-project/
 ├── docker-compose.yml
 ├── README.md ( this file )
 
----
+```
 
 # 🚀 How to Run Bistro92 (Step-by-Step)
 
----
-```
+
 ## Step 1️⃣: Install Docker and Docker Compose
 
 Make sure you have:
@@ -165,4 +164,3 @@ x-api-key: 835cf0faa598693992deb0cdd41f1142164a4f1b9f9014ba7fd4af4e8d9fa1d9
 ```
 
 ✅ Otherwise, the server will reject unauthorized requests for security reasons.
-```
