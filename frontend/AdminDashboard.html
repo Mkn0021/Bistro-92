@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #1e2a44;
+            color: #ffffff;
+        }
+
+        /* Login Page */
+        #login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1e2a44;
+        }
+
+        .login-container {
+            background-color: #2a3b66;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .login-container h2 {
+            color: #f4d03f;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-container input {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #3a4b7c;
+            color: #ffffff;
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 0.8rem;
+            margin-top: 1rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #f4d03f;
+            color: #1e2a44;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .login-container button:hover {
+            background-color: #d4b02f;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #2a3b66;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar a {
+            color: #f4d03f;
+            text-decoration: none;
+            margin: 0 1rem;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .navbar a:hover {
+            color: #ffffff;
+        }
+
+        /* Dashboard */
+        #dashboard,
+        #orders-page,
+        #sales-page {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .orders-section {
+            background-color: #2a3b66;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .order-card {
+            background-color: #3a4b7c;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .order-card h3 {
+            color: #f4d03f;
+        }
+
+        .order-card button {
+            padding: 0.5rem 1rem;
+            margin-top: 0.5rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #f4d03f;
+            color: #1e2a44;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .order-card button:hover {
+            background-color: #d4b02f;
+        }
+
+        .stats-section {
+            background-color: #2a3b66;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .stats-section h2 {
+            color: #f4d03f;
+            margin-bottom: 1rem;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            margin: 0 0.2rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #f4d03f;
+            color: #1e2a44;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .pagination button:hover {
+            background-color: #d4b02f;
+        }
+
+        .pagination button:disabled {
+            background-color: #3a4b7c;
+            cursor: not-allowed;
+        }
+
+        /* Sales Page */
+        #sales-page,
+        #orders-page {
+            display: none;
+        }
+
+        .sales-chart {
+            background-color: #2a3b66;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+
+        .sales-stats {
+            background-color: #2a3b66;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #f4d03f;
+            color: #1e2a44;
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: fadeIn 0.5s ease-in forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Login Page -->
+    <div id="login-page">
+        <div class="login-container">
+            <h2>Admin Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Login</button>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar" style="display: none;">
+        <div class="logo">Kitchen & Admin Dashboard</div>
+        <div>
+            <a href="#" onclick="showPage('dashboard')">Dashboard</a>
+            <a href="#" onclick="showPage('orders-page')">Orders</a>
+            <a href="#" onclick="showPage('sales-page')">Sales</a>
+        </div>
+    </nav>
+
+    <!-- Dashboard -->
+    <div id="dashboard">
+        <div class="dashboard-grid">
+            <div class="stats-section">
+                <h2>Order Statistics</h2>
+                <canvas id="order-chart" style="max-height: 400px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Page -->
+    <div id="orders-page">
+        <div class="orders-section">
+            <h2>Pending Orders</h2>
+            <div id="orders-list"></div>
+            <div class="pagination">
+                <button onclick="changePage(-1)" id="prev-page">Previous</button>
+                <button onclick="changePage(1)" id="next-page">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Page -->
+    <div id="sales-page">
+        <div class="sales-stats">
+            <h2>Statistics</h2>
+            <p>Average Fulfillment Time: <span id="avg-time">0</span> mins</p>
+            <p>Total Sales: $<span id="total-sales">0</span></p>
+        </div>
+        <div class="sales-chart">
+            <h2>Sales Overview</h2>
+            <canvas id="sales-chart"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Simulated dataset
+        // let orders = [
+        //     {
+        //         id: '1',
+        //         table_number: 5,
+        //         status: 'pending',
+        //         total_price: 25.50,
+        //         createdAt: new Date().toISOString(),
+        //         orderItems: [
+        //             { quantity: 2, menuItem: { name: 'Burger' } },
+        //             { quantity: 1, menuItem: { name: 'Fries' } }
+        //         ]
+        //     },
+        //     {
+        //         id: '2',
+        //         table_number: 3,
+        //         status: 'confirmed',
+        //         total_price: 15.00,
+        //         createdAt: new Date(Date.now() - 3600000).toISOString(),
+        //         orderItems: [
+        //             { quantity: 1, menuItem: { name: 'Soda' } }
+        //         ]
+        //     },
+        //     {
+        //         id: '3',
+        //         table_number: 7,
+        //         status: 'completed',
+        //         total_price: 30.00,
+        //         createdAt: new Date(Date.now() - 7200000).toISOString(),
+        //         estimated_time: 15,
+        //         orderItems: [
+        //             { quantity: 3, menuItem: { name: 'Burger' } }
+        //         ]
+        //     },
+        //     {
+        //         id: '4',
+        //         table_number: 2,
+        //         status: 'cancelled',
+        //         total_price: 20.00,
+        //         createdAt: new Date(Date.now() - 10800000).toISOString(),
+        //         orderItems: [
+        //             { quantity: 2, menuItem: { name: 'Fries' } }
+        //         ]
+        //     }
+        // ];
+
+        let page = 1;
+        const ordersPerPage = 10;
+        let orderChart;
+
+        // Login
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if ((username === 'admin' && password === 'password') || 1) {
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('navbar').style.display = 'flex';
+                document.getElementById('dashboard').style.display = 'block';
+                updateOrdersPage();
+                updateOrderChart();
+                updateSalesPage();
+            } else {
+                alert('Invalid credentials');
+            }
+        }
+
+        // Page Navigation
+        function showPage(pageId) {
+            document.getElementById('dashboard').style.display = pageId === 'dashboard' ? 'block' : 'none';
+            document.getElementById('orders-page').style.display = pageId === 'orders-page' ? 'block' : 'none';
+            document.getElementById('sales-page').style.display = pageId === 'sales-page' ? 'block' : 'none';
+            if (pageId === 'dashboard') {
+                updateOrderChart();
+            } else if (pageId === 'sales-page') {
+                updateSalesChart();
+            } else if (pageId === 'orders-page') {
+                updateOrdersPage();
+            }
+        }
+
+        async function fetchAndUpdateStats() {
+            try {
+                const response = await fetch(`http://localhost:3000/api/admin/stats`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-api-key": "835cf0faa598693992deb0cdd41f1142164a4f1b9f9014ba7fd4af4e8d9fa1d9",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch statistics");
+                }
+
+                const stats = await response.json();
+                console.log("Fetched stats:", stats);
+
+                // Update the Average Fulfillment Time and Total Sales
+                document.getElementById("avg-time").textContent = stats.avgOrderPrepTime
+                    ? parseFloat(stats.avgOrderPrepTime[0].avgEstimatedTime).toFixed(2)
+                    : "0.00";
+                document.getElementById("total-sales").textContent = stats.totalRevenue
+                    ? parseFloat(stats.totalRevenue).toFixed(2)
+                    : "0.00";
+
+                // Update the pie chart with the fetched data
+                updateOrderChart(stats);
+            } catch (error) {
+                console.error("Error fetching stats:", error);
+            }
+        }
+
+        function updateOrderChart(stats) {
+            const ctx = document.getElementById("order-chart").getContext("2d");
+
+            // Destroy the existing chart if it exists
+            if (orderChart) {
+                orderChart.destroy();
+            }
+
+            // Create a new pie chart with the fetched data
+            orderChart = new Chart(ctx, {
+                type: "pie",
+                data: {
+                    labels: ["Pending Orders", "Completed Orders", "Cancelled Orders"],
+                    datasets: [
+                        {
+                            data: [
+                                stats.pendingOrdersCount,
+                                stats.completedOrdersCount,
+                                stats.cancelledOrdersCount,
+                            ],
+                            backgroundColor: ["#f4d03f", "#3a4b7c", "#2a3b66"],
+                            borderColor: "#1e2a44",
+                            borderWidth: 1,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: "top",
+                            labels: { color: "#f4d03f" },
+                        },
+                    },
+                },
+            });
+        }
+
+        // Call the function to fetch stats and update the chart on page load
+        window.addEventListener("load", fetchAndUpdateStats);
+
+        // Update Orders Page
+        function updateOrdersPage() {
+            const ordersList = document.getElementById('orders-list');
+            ordersList.innerHTML = '';
+
+            const start = (page - 1) * ordersPerPage;
+            const end = start + ordersPerPage;
+            const paginatedOrders = orders.filter(order => order.status === 'pending').slice(start, end);
+
+            paginatedOrders.forEach(order => {
+                const items = order.orderItems.map(item => `${item.menuItem.name} (${item.quantity})`).join(', ');
+                const card = document.createElement('div');
+                card.className = 'order-card';
+                card.innerHTML = `
+                    <h3>Table ${order.table_number}</h3>
+                    <p>Items: ${items}</p>
+                    <p>Total Price: $${order.total_price}</p>
+                    <p>Order Time: ${new Date(order.createdAt).toLocaleString()}</p>
+                    <button onclick="showNotification('Order from Table ${order.table_number} is pending!')">Notify</button>
+                `;
+                ordersList.appendChild(card);
+            });
+
+            // Update Pagination
+            document.getElementById('prev-page').disabled = page === 1;
+            document.getElementById('next-page').disabled = end >= orders.filter(o => o.status === 'pending').length;
+        }
+
+        // Pagination
+        function changePage(direction) {
+            page += direction;
+            updateOrdersPage();
+        }
+
+        // Notification
+        function showNotification(message) {
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notif => notif.remove());
+
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Allow manual dismissal
+            notification.onclick = () => notification.remove();
+        }
+
+        // // Order Pie Chart
+        // let orderChart;
+        // function updateOrderChart() {
+        //     const ctx = document.getElementById('order-chart').getContext('2d');
+        //     if (orderChart) orderChart.destroy();
+
+        //     const totalOrders = orders.length;
+        //     const cancelledOrders = orders.filter(o => o.status === 'cancelled').length;
+        //     const confirmedOrders = orders.filter(o => o.status === 'confirmed').length;
+
+        //     orderChart = new Chart(ctx, {
+        //         type: 'pie',
+        //         data: {
+        //             labels: ['Total Orders', 'Cancelled Orders', 'Confirmed Orders'],
+        //             datasets: [{
+        //                 data: [totalOrders, cancelledOrders, confirmedOrders],
+        //                 backgroundColor: ['#f4d03f', '#3a4b7c', '#2a3b66'],
+        //                 borderColor: '#1e2a44',
+        //                 borderWidth: 1
+        //             }]
+        //         },
+        //         options: {
+        //             responsive: true,
+        //             plugins: {
+        //                 legend: {
+        //                     position: 'top',
+        //                     labels: { color: '#f4d03f' }
+        //                 }
+        //             }
+        //         }
+        //     });
+        // }
+
+        // Sales Chart
+        let salesChart;
+        function updateSalesChart() {
+            const ctx = document.getElementById('sales-chart').getContext('2d');
+            if (salesChart) salesChart.destroy();
+
+            const totalSales = orders
+                .filter(o => o.status === 'completed')
+                .reduce((sum, order) => sum + parseFloat(order.total_price || 0), 0);
+
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Sales ($)',
+                        data: [1000, 1500, 1200, 1800, totalSales, totalSales + 500],
+                        borderColor: '#f4d03f',
+                        backgroundColor: 'rgba(244, 208, 63, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Update Sales Page
+        
+        function updateSalesPage() {
+            const completedOrders = orders.filter(o => o.status === 'completed');
+            const avgFulfillmentTime = completedOrders.length
+                ? completedOrders.reduce((sum, order) => sum + (order.estimated_time || 0), 0) / completedOrders.length
+                : 0;
+            const totalSales = completedOrders.reduce((sum, order) => sum + parseFloat(order.total_price || 0), 0);
+
+            document.getElementById('avg-time').textContent = avgFulfillmentTime.toFixed(2);
+            document.getElementById('total-sales').textContent = totalSales.toFixed(2);
+        }
+    </script>
+</body>
+
+</html>
